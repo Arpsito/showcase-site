@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Homer Showcase</title>
-  <meta name="description" content="How a PE fundraiser built a 24/7 AI ecosystem from scratch in 5 weeks." />
+  <meta name="description" content="A personal AI operating system built by Andres Perez." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
@@ -160,13 +160,44 @@
       border: 1px solid rgba(20, 20, 40, 0.08);
       background: var(--paper);
       box-shadow: 0 10px 20px rgba(20, 20, 40, 0.08);
-      transform: translateY(var(--drift, 0px));
-      transition: transform 200ms ease;
+      transform: translateY(8px) scale(0.98);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      cursor: pointer;
+      opacity: 0;
+      animation:
+        hero-pill-in 600ms ease forwards,
+        hero-drift var(--float-dur, 8.5s) ease-in-out infinite;
+      animation-delay: var(--appear, 0ms), calc(var(--appear, 0ms) + 600ms);
     }
 
     .hero-float i {
       width: 14px;
       height: 14px;
+    }
+
+    .hero-float.glow {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 18px var(--pill-glow, rgba(96, 165, 250, 0.4));
+      transform: translateY(var(--float-y, 0px)) scale(1.03);
+    }
+
+    .hero-pill-tooltip {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111827;
+      color: #fff;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      padding: 0.35rem 0.48rem;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+
+    .hero-float.show-tooltip .hero-pill-tooltip {
+      opacity: 1;
     }
 
     .scroll-chip {
@@ -199,6 +230,7 @@
       padding: 1.1rem 0.9rem 1rem;
       text-align: left;
       border-right: 1px solid var(--border);
+      position: relative;
     }
 
     .stat-item:last-child {
@@ -206,6 +238,7 @@
     }
 
     .stat-value {
+      display: block;
       font-family: "JetBrains Mono", ui-monospace, monospace;
       font-size: 2rem;
       font-weight: 700;
@@ -213,9 +246,46 @@
       margin-top: 0.6rem;
     }
 
+    .stat-trigger {
+      display: inline-block;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+
+    .stat-tooltip {
+      position: absolute;
+      top: calc(100% - 2px);
+      left: 0.8rem;
+      right: 0.8rem;
+      z-index: 5;
+      background: #111827;
+      color: #fff;
+      font-size: 0.72rem;
+      line-height: 1.3;
+      padding: 0.44rem 0.5rem;
+      border-radius: 10px;
+      opacity: 0;
+      transform: translateY(-2px);
+      pointer-events: none;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .stat-item.show-tooltip .stat-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
     .timeline-shell {
       overflow-x: auto;
       padding-bottom: 0.35rem;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
     }
 
     .timeline-track {
@@ -260,9 +330,50 @@
       border: 1px solid var(--border);
       border-left-width: 6px;
       border-radius: 16px;
-      padding: 1.05rem 1rem 1rem;
+      padding: 1.05rem 1rem 0.95rem;
       box-shadow: 0 12px 24px rgba(20, 20, 40, 0.06);
-      min-height: 236px;
+      min-height: 220px;
+      scroll-snap-align: start;
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+
+    .week-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      cursor: pointer;
+      padding: 0.2rem 0;
+    }
+
+    .week-toggle {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      border: 1px solid #d5dae6;
+      color: #616173;
+      line-height: 1;
+      transform: rotate(0deg);
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .week-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 320ms ease;
+    }
+
+    .week-card.open .week-details {
+      max-height: 340px;
+    }
+
+    .week-card.open .week-toggle {
+      transform: rotate(45deg);
+      border-color: #bfc7d8;
     }
 
     .cap-grid {
@@ -279,11 +390,47 @@
       padding: 1rem;
       box-shadow: var(--shadow-soft);
       transition: transform 180ms ease, box-shadow 180ms ease;
+      cursor: pointer;
     }
 
-    .cap-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
+    .cap-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .cap-toggle {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #d8dce7;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #606174;
+      line-height: 1;
+      flex-shrink: 0;
+      transform: rotate(0deg);
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .cap-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 320ms ease, margin-top 320ms ease;
+      margin-top: 0;
+    }
+
+    .cap-card.open .cap-body {
+      max-height: 220px;
+      margin-top: 0.55rem;
+    }
+
+    .cap-card.open .cap-toggle {
+      transform: rotate(45deg);
+      border-color: #c4cada;
     }
 
     .icon-pill {
@@ -301,22 +448,13 @@
       color: #1f2a33;
     }
 
-    .stack-wrap {
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 420ms ease, transform 420ms ease;
-    }
-
-    .stack-wrap.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
     .stack-diagram {
       display: grid;
       gap: 0.9rem;
       justify-items: center;
       margin-top: 1.1rem;
+      position: relative;
+      isolation: isolate;
     }
 
     .stack-layer {
@@ -327,11 +465,8 @@
       border: 1px solid rgba(20, 20, 40, 0.1);
       box-shadow: 0 8px 20px rgba(20, 20, 40, 0.07);
       font-weight: 600;
-      transition: transform 220ms ease;
-    }
-
-    .stack-layer:hover {
-      transform: translateY(-2px);
+      opacity: 0;
+      transform: translateX(-20px);
     }
 
     .stack-arrow {
@@ -339,6 +474,9 @@
       height: 22px;
       background: #ced4df;
       position: relative;
+      transform-origin: top;
+      transform: scaleY(0);
+      opacity: 0;
     }
 
     .stack-arrow::after {
@@ -351,6 +489,31 @@
       border-left: 2px solid #ced4df;
       border-bottom: 2px solid #ced4df;
       transform: rotate(-45deg);
+      opacity: 0;
+    }
+
+    .stack-layer.animate-in {
+      animation: layer-slide 560ms cubic-bezier(0.2, 0.95, 0.3, 1.2) forwards;
+    }
+
+    .stack-arrow.animate-in {
+      animation: arrow-grow 420ms ease forwards;
+    }
+
+    .stack-arrow.animate-in::after {
+      animation: arrow-tip 220ms ease forwards;
+      animation-delay: 280ms;
+    }
+
+    .stack-diagram.pulse::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 16px;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      animation: stack-ripple 700ms ease-out forwards;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .rhythm {
@@ -374,6 +537,7 @@
       padding: 0.7rem;
       background: #fff;
       min-height: 126px;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
     }
 
     .rhythm-dot {
@@ -382,6 +546,23 @@
       border-radius: 999px;
       margin-bottom: 0.5rem;
       box-shadow: 0 0 0 5px rgba(229, 231, 235, 0.55);
+    }
+
+    .rhythm-point.active-now {
+      border-color: rgba(46, 196, 182, 0.55);
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.18);
+    }
+
+    .live-clock {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: #4b5563;
+      border: 1px solid var(--border);
+      padding: 0.36rem 0.6rem;
+      border-radius: 999px;
+      background: #fff;
     }
 
     .enterprise-banner {
@@ -406,12 +587,6 @@
       color: #6c7182;
     }
 
-    .quote {
-      font-family: "Space Grotesk", Inter, sans-serif;
-      font-style: italic;
-      color: #3f3f53;
-    }
-
     .orb {
       position: fixed;
       width: 180px;
@@ -424,6 +599,29 @@
       z-index: -1;
       transform: translateY(var(--parallax, 0px));
       transition: transform 120ms linear;
+    }
+
+    .parallax-head {
+      transform: translateY(var(--head-shift, 0px));
+      transition: transform 120ms linear;
+      will-change: transform;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .tap-pulse {
+      transform: scale(0.97) !important;
+      transition: transform 120ms ease;
+    }
+
+    @media (hover: hover) {
+      .tilt-card:hover {
+        transform: perspective(900px) rotateX(1.4deg) rotateY(-1.4deg) translateY(-2px);
+        box-shadow: var(--shadow-hover);
+      }
     }
 
     @media (max-width: 1200px) {
@@ -465,19 +663,21 @@
 
     @media (max-width: 768px) {
       .timeline-track {
-        min-width: auto;
-        grid-template-columns: 1fr;
-        padding-top: 0;
+        min-width: max-content;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(260px, 82vw);
+        grid-template-columns: none;
+        padding-top: 2.2rem;
       }
 
-      .timeline-track::before {
-        content: none;
+      .timeline-shell {
+        padding-bottom: 0.9rem;
       }
 
       .week-dot {
-        top: 0.85rem;
-        left: auto;
-        right: 0.85rem;
+        top: -1.2rem;
+        left: 1rem;
+        right: auto;
       }
 
       .cap-grid,
@@ -504,6 +704,63 @@
         min-width: 0;
       }
     }
+
+    @keyframes hero-pill-in {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes hero-drift {
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(var(--float-y, 7px)) translateX(var(--float-x, -3px)); }
+      100% { transform: translateY(0) translateX(0); }
+    }
+
+    @keyframes layer-slide {
+      0% {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      70% {
+        opacity: 1;
+        transform: translateX(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes arrow-grow {
+      from {
+        opacity: 0;
+        transform: scaleY(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes arrow-tip {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes stack-ripple {
+      from {
+        opacity: 0.6;
+        transform: scale(0.98);
+      }
+      to {
+        opacity: 0;
+        transform: scale(1.02);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -527,7 +784,7 @@
         <a class="nav-link" href="#journey">The Journey</a>
         <a class="nav-link" href="#capabilities">What Homer Does</a>
         <a class="nav-link" href="#stack">The Stack</a>
-        <a class="nav-link" href="#next">What's Next</a>
+        <a class="nav-link" href="#next">Roadmap</a>
       </div>
 
       <p class="text-sm font-medium text-[#575767]">Andres Perez</p>
@@ -539,10 +796,10 @@
       <div class="max-w-6xl mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
         <div>
           <p class="inline-flex text-xs tracking-[0.2em] uppercase text-[#6f6f82] font-semibold border border-[#e6e8ee] rounded-full px-3 py-1">AI Transformation Showcase</p>
-          <h1 class="mt-5 font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.03] text-[#1a1a2e]">5 Weeks. Zero Code. One AI Agent.</h1>
-          <p class="mt-4 text-lg md:text-xl text-[#4a4a5a] max-w-2xl">How a PE fundraiser built a 24/7 AI ecosystem from scratch</p>
-          <p class="mt-2 text-base text-[#57576a]">Built by Andres Perez — PE Fundraiser, Zero Technical Background</p>
-          <p class="mt-5 text-sm text-[#5c5c70] border-l-4 pl-4 border-[#ff6b6b]">Built with OpenClaw, custom skills, and relentless iteration</p>
+          <h1 class="parallax-head mt-5 font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.03] text-[#1a1a2e]">5 Weeks. Zero Code. One AI Agent.</h1>
+          <p class="mt-4 text-lg md:text-xl text-[#4a4a5a] max-w-2xl">A personal AI operating system</p>
+          <p class="mt-2 text-base text-[#57576a]">Built by Andres Perez</p>
+          <p class="mt-5 text-sm text-[#5c5c70] border-l-4 pl-4 border-[#ff6b6b]">Built with OpenClaw, custom skills, and daily build cycles</p>
           <a href="#numbers" class="scroll-chip mt-7">
             <i data-lucide="chevrons-down"></i>
             <span>Scroll</span>
@@ -550,14 +807,14 @@
         </div>
 
         <div class="hero-cloud" aria-label="Homer skill cloud">
-          <span class="hero-float" style="left:12%;top:16%;--drift:0px;background:#fff4f4;"><i data-lucide="wrench"></i>31 Skills</span>
-          <span class="hero-float" style="left:45%;top:12%;--drift:-2px;background:#edfdfa;"><i data-lucide="plug"></i>18 Integrations</span>
-          <span class="hero-float" style="left:65%;top:27%;--drift:1px;background:#fff8e5;"><i data-lucide="brain"></i>Open Brain</span>
-          <span class="hero-float" style="left:20%;top:39%;--drift:-1px;background:#eff6ff;"><i data-lucide="mic"></i>Voice Ready</span>
-          <span class="hero-float" style="left:52%;top:45%;--drift:2px;background:#f4f0ff;"><i data-lucide="code"></i>Autonomous Coding</span>
-          <span class="hero-float" style="left:14%;top:63%;--drift:0px;background:#ecfdf5;"><i data-lucide="newspaper"></i>Daily Content</span>
-          <span class="hero-float" style="left:43%;top:72%;--drift:-1px;background:#fff2d8;"><i data-lucide="clock"></i>24/7 Runtime</span>
-          <span class="hero-float" style="left:71%;top:62%;--drift:1px;background:#f4f8ff;"><i data-lucide="shield"></i>Security</span>
+          <button class="hero-float" type="button" data-pill data-pill-detail="31 custom skills running daily" style="left:12%;top:16%;background:#fff4f4;--appear:80ms;--float-dur:8.2s;--float-y:8px;--float-x:-3px;--pill-glow:rgba(255,107,107,.45);"><i data-lucide="wrench"></i>31 Skills<span class="hero-pill-tooltip">31 custom skills running daily</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="18 live service integrations" style="left:45%;top:12%;background:#edfdfa;--appear:280ms;--float-dur:9.4s;--float-y:-7px;--float-x:3px;--pill-glow:rgba(46,196,182,.45);"><i data-lucide="plug"></i>18 Integrations<span class="hero-pill-tooltip">18 live service integrations</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Vector memory across 1,500+ chunks" style="left:65%;top:27%;background:#fff8e5;--appear:520ms;--float-dur:7.8s;--float-y:7px;--float-x:2px;--pill-glow:rgba(255,209,102,.45);"><i data-lucide="brain"></i>Open Brain<span class="hero-pill-tooltip">Vector memory across 1,500+ chunks</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Two-way voice note conversations" style="left:20%;top:39%;background:#eff6ff;--appear:760ms;--float-dur:8.9s;--float-y:-8px;--float-x:-2px;--pill-glow:rgba(96,165,250,.45);"><i data-lucide="mic"></i>Voice Ready<span class="hero-pill-tooltip">Two-way voice note conversations</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Overnight delegated coding loops" style="left:52%;top:45%;background:#f4f0ff;--appear:980ms;--float-dur:9.9s;--float-y:9px;--float-x:-3px;--pill-glow:rgba(167,139,250,.45);"><i data-lucide="code"></i>Autonomous Coding<span class="hero-pill-tooltip">Overnight delegated coding loops</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Digest and report generation automation" style="left:14%;top:63%;background:#ecfdf5;--appear:1240ms;--float-dur:8.7s;--float-y:7px;--float-x:3px;--pill-glow:rgba(52,211,153,.45);"><i data-lucide="newspaper"></i>Daily Content<span class="hero-pill-tooltip">Digest and report generation automation</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Running 24/7 since Jan 27, 2026" style="left:43%;top:72%;background:#fff2d8;--appear:1500ms;--float-dur:9.1s;--float-y:-8px;--float-x:2px;--pill-glow:rgba(245,158,11,.45);"><i data-lucide="clock"></i>24/7 Runtime<span class="hero-pill-tooltip">Running 24/7 since Jan 27, 2026</span></button>
+          <button class="hero-float" type="button" data-pill data-pill-detail="Automated security checks and logs" style="left:71%;top:62%;background:#f4f8ff;--appear:1760ms;--float-dur:8.4s;--float-y:8px;--float-x:-2px;--pill-glow:rgba(59,130,246,.45);"><i data-lucide="shield"></i>Security<span class="hero-pill-tooltip">Automated security checks and logs</span></button>
           <div class="absolute bottom-4 right-4 z-10">
             <span class="hero-tag">Tag cloud of live capabilities</span>
           </div>
@@ -567,38 +824,44 @@
 
     <section id="numbers" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">By The Numbers</h2>
-        <p class="mt-3 text-[#4a4a5a]">Measured output in 5 weeks of focused AI system building.</p>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">By The Numbers</h2>
+        <p class="mt-3 text-[#4a4a5a]">System metrics since January 27, 2026.</p>
         <div class="stat-row mt-8 rounded-xl overflow-hidden">
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#ffe7e7;"><i data-lucide="wrench"></i></div>
-            <p class="stat-value" style="color:var(--coral)"><span class="counter" data-target="31" data-suffix="">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--coral)"><span class="counter" data-target="31" data-suffix="">0</span></span></button>
             <p class="text-sm text-[#59596d]">Custom AI Skills Built</p>
+            <div class="stat-tooltip">Custom automation scripts covering research, voice, security, family ops, and more</div>
           </article>
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#ebfaf8;"><i data-lucide="book-open"></i></div>
-            <p class="stat-value" style="color:var(--teal)"><span class="counter" data-target="293" data-suffix="">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--teal)"><span class="counter" data-target="293" data-suffix="">0</span></span></button>
             <p class="text-sm text-[#59596d]">Knowledge Base Documents</p>
+            <div class="stat-tooltip">Obsidian vault with notes, references, project docs, and daily logs</div>
           </article>
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#fff7e3;"><i data-lucide="plug"></i></div>
-            <p class="stat-value" style="color:var(--gold)"><span class="counter" data-target="18" data-suffix="">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--gold)"><span class="counter" data-target="18" data-suffix="">0</span></span></button>
             <p class="text-sm text-[#59596d]">Platform Integrations</p>
+            <div class="stat-tooltip">WhatsApp, Gmail, Calendar, Todoist, Spotify, GitHub, Supabase, and more</div>
           </article>
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#f3eeff;"><i data-lucide="clock"></i></div>
-            <p class="stat-value" style="color:var(--lavender)"><span class="counter" data-target="40" data-suffix="+">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--lavender)"><span class="counter" data-target="40" data-suffix="+">0</span></span></button>
             <p class="text-sm text-[#59596d]">Days Running 24/7</p>
+            <div class="stat-tooltip">Running 24/7 since January 27, 2026 on a Mac mini</div>
           </article>
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#eaf2ff;"><i data-lucide="puzzle"></i></div>
-            <p class="stat-value" style="color:var(--sky)"><span class="counter" data-target="1500" data-suffix="+">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--sky)"><span class="counter" data-target="1500" data-suffix="+">0</span></span></button>
             <p class="text-sm text-[#59596d]">Searchable Knowledge Chunks</p>
+            <div class="stat-tooltip">Vector-embedded knowledge searchable by any MCP-compatible AI</div>
           </article>
           <article class="stat-item">
             <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg" style="background:#e8fbf1;"><i data-lucide="settings"></i></div>
-            <p class="stat-value" style="color:var(--mint)"><span class="counter" data-target="6" data-suffix="">0</span></p>
+            <button class="stat-trigger" type="button"><span class="stat-value" style="color:var(--mint)"><span class="counter" data-target="6" data-suffix="">0</span></span></button>
             <p class="text-sm text-[#59596d]">Daily Automated Workflows</p>
+            <div class="stat-tooltip">Morning brief, HN digest, research briefs, sync jobs, evening check-in, overnight coding</div>
           </article>
         </div>
       </div>
@@ -606,64 +869,99 @@
 
     <section id="journey" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">The Journey</h2>
-        <p class="mt-3 text-[#4a4a5a]">A 5-week build sprint from setup to autonomous operation.</p>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">The Journey</h2>
+        <p class="mt-3 text-[#4a4a5a]">Build timeline.</p>
 
         <div class="timeline-shell mt-8">
           <div class="timeline-track">
-            <article class="week-card" style="border-left-color:var(--coral)">
+            <article class="week-card tilt-card" style="border-left-color:var(--coral)">
               <span class="week-dot" style="background:var(--coral)">1</span>
-              <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 1 (Jan 27 - Feb 2)</p>
-              <h3 class="mt-2 text-2xl font-display font-bold">Foundation</h3>
-              <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
-                <li>Mac mini setup, OpenClaw installation, security hardening</li>
-                <li>Configured WhatsApp, Gmail, Calendar integrations</li>
-                <li>Built first 4 custom skills and Obsidian vault with Sync</li>
-              </ul>
+              <div class="week-summary" role="button" tabindex="0">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 1 (Jan 27 - Feb 2)</p>
+                  <h3 class="mt-2 text-2xl font-display font-bold">Foundation</h3>
+                </div>
+                <span class="week-toggle">+</span>
+              </div>
+              <div class="week-details">
+                <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
+                  <li>Mac mini setup, OpenClaw installation, security hardening</li>
+                  <li>Configured WhatsApp, Gmail, Calendar integrations</li>
+                  <li>Built first 4 custom skills and Obsidian vault with Sync</li>
+                </ul>
+              </div>
             </article>
 
-            <article class="week-card" style="border-left-color:var(--teal)">
+            <article class="week-card tilt-card" style="border-left-color:var(--teal)">
               <span class="week-dot" style="background:var(--teal)">2</span>
-              <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 2 (Feb 3 - Feb 9)</p>
-              <h3 class="mt-2 text-2xl font-display font-bold">Acceleration</h3>
-              <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
-                <li>Voice enhancement with ElevenLabs TTS and Codex CLI integration</li>
-                <li>1Password secret management + automated morning briefings</li>
-                <li>Solo RPG catalog workflow, 15 games cataloged</li>
-              </ul>
+              <div class="week-summary" role="button" tabindex="0">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 2 (Feb 3 - Feb 9)</p>
+                  <h3 class="mt-2 text-2xl font-display font-bold">Acceleration</h3>
+                </div>
+                <span class="week-toggle">+</span>
+              </div>
+              <div class="week-details">
+                <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
+                  <li>Voice enhancement with ElevenLabs TTS and Codex CLI integration</li>
+                  <li>1Password secret management + automated morning briefings</li>
+                  <li>Solo RPG catalog workflow, 15 games cataloged</li>
+                </ul>
+              </div>
             </article>
 
-            <article class="week-card" style="border-left-color:var(--gold)">
+            <article class="week-card tilt-card" style="border-left-color:var(--gold)">
               <span class="week-dot" style="background:#efb930">3</span>
-              <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 3 (Feb 10 - Feb 16)</p>
-              <h3 class="mt-2 text-2xl font-display font-bold">Intelligence</h3>
-              <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
-                <li>Self-improvement system, batch 2 skills, and People CRM</li>
-                <li>Semantic memory search and Family Hub PWA built in 2 hours</li>
-                <li>Family logistics, HN deep dive, weekly review automation</li>
-              </ul>
+              <div class="week-summary" role="button" tabindex="0">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 3 (Feb 10 - Feb 16)</p>
+                  <h3 class="mt-2 text-2xl font-display font-bold">Intelligence</h3>
+                </div>
+                <span class="week-toggle">+</span>
+              </div>
+              <div class="week-details">
+                <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
+                  <li>Self-improvement system, batch 2 skills, and People CRM</li>
+                  <li>Semantic memory search and Family Hub PWA built in 2 hours</li>
+                  <li>Family logistics, HN deep dive, weekly review automation</li>
+                </ul>
+              </div>
             </article>
 
-            <article class="week-card" style="border-left-color:var(--lavender)">
+            <article class="week-card tilt-card" style="border-left-color:var(--lavender)">
               <span class="week-dot" style="background:var(--lavender)">4</span>
-              <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 4 (Feb 17 - Feb 23)</p>
-              <h3 class="mt-2 text-2xl font-display font-bold">Scale</h3>
-              <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
-                <li>Telegram multi-channel architecture with autonomous coding loops</li>
-                <li>Parallel module building (Dark Factory) and QA harness</li>
-                <li>Trend research and content analysis workflows</li>
-              </ul>
+              <div class="week-summary" role="button" tabindex="0">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 4 (Feb 17 - Feb 23)</p>
+                  <h3 class="mt-2 text-2xl font-display font-bold">Scale</h3>
+                </div>
+                <span class="week-toggle">+</span>
+              </div>
+              <div class="week-details">
+                <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
+                  <li>Telegram multi-channel architecture with autonomous coding loops</li>
+                  <li>Parallel module building (Dark Factory) and QA harness</li>
+                  <li>Trend research and content analysis workflows</li>
+                </ul>
+              </div>
             </article>
 
-            <article class="week-card" style="border-left-color:var(--mint)">
+            <article class="week-card tilt-card" style="border-left-color:var(--mint)">
               <span class="week-dot" style="background:var(--mint)">5</span>
-              <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 5 (Feb 24 - Mar 7)</p>
-              <h3 class="mt-2 text-2xl font-display font-bold">Mastery</h3>
-              <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
-                <li>MCP knowledge base (Open Brain) with vector search</li>
-                <li>Economist EPUB pipeline, HomerSec, and voice cloning</li>
-                <li>Stable 24/7 autonomous operation</li>
-              </ul>
+              <div class="week-summary" role="button" tabindex="0">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.14em] text-[#6c6c7f]">Week 5 (Feb 24 - Mar 7)</p>
+                  <h3 class="mt-2 text-2xl font-display font-bold">Mastery</h3>
+                </div>
+                <span class="week-toggle">+</span>
+              </div>
+              <div class="week-details">
+                <ul class="mt-3 text-[#4a4a5a] list-disc list-inside space-y-1 text-sm">
+                  <li>MCP knowledge base (Open Brain) with vector search</li>
+                  <li>Economist EPUB pipeline, HomerSec, and voice cloning</li>
+                  <li>Stable 24/7 autonomous operation</li>
+                </ul>
+              </div>
             </article>
           </div>
         </div>
@@ -672,49 +970,105 @@
 
     <section id="capabilities" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">What Homer Does</h2>
-        <p class="mt-3 text-[#4a4a5a]">Core capabilities that run daily without manual intervention.</p>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">What Homer Does</h2>
+        <p class="mt-3 text-[#4a4a5a]">Daily automated capabilities.</p>
 
         <div class="cap-grid mt-8">
-          <article class="cap-card" style="border-left-color:var(--coral)">
-            <span class="icon-pill" style="background:#ffe7e7"><i data-lucide="sun"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Morning Intelligence Brief</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">AI-generated daily briefing covering weather, calendar, tasks, world news, AI developments, and health metrics. Delivered as audio via WhatsApp at 6:30 AM.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--coral)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#ffe7e7"><i data-lucide="sun"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Morning Intelligence Brief</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">AI-generated daily briefing covering weather, calendar, tasks, world news, AI developments, and health metrics. Delivered as audio via WhatsApp at 6:30 AM.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--teal)">
-            <span class="icon-pill" style="background:#e8fbf8"><i data-lucide="search"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Research on Demand</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Deep-dive research briefs on any topic, saved to a searchable knowledge base. Rotating daily topics: AI, industry trends, entertainment.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--teal)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#e8fbf8"><i data-lucide="search"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Research on Demand</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Deep-dive research briefs on any topic, saved to a searchable knowledge base. Rotating daily topics: AI, industry trends, entertainment.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--gold)">
-            <span class="icon-pill" style="background:#fff6de"><i data-lucide="mic"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Voice Interaction</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Natural voice conversations via WhatsApp. Custom cloned voice. Responds to voice notes with voice. 2-way audio dialogue.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--gold)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#fff6de"><i data-lucide="mic"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Voice Interaction</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Natural voice conversations via WhatsApp. Custom cloned voice. Responds to voice notes with voice. 2-way audio dialogue.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--lavender)">
-            <span class="icon-pill" style="background:#f3eeff"><i data-lucide="brain"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Knowledge Base (Open Brain)</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">MCP-compatible vector database. 293 documents, 1,500+ searchable chunks. Any AI tool can query it via universal protocol.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--lavender)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#f3eeff"><i data-lucide="brain"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Knowledge Base (Open Brain)</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">MCP-compatible vector database. 293 documents, 1,500+ searchable chunks. Any AI tool can query it via universal protocol.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--sky)">
-            <span class="icon-pill" style="background:#eaf3ff"><i data-lucide="shield"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Security Engine</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Custom-built security guardrails. Pattern matching, audit logging, supply chain protection. 1,000 checks in 6ms.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--sky)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#eaf3ff"><i data-lucide="shield"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Security Engine</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Custom-built security guardrails. Pattern matching, audit logging, supply chain protection. 1,000 checks in 6ms.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--mint)">
-            <span class="icon-pill" style="background:#e8fbf1"><i data-lucide="users"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Family Operations</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Calendar management, logistics tracking, school coordination, travel planning. Full family command center.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--mint)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#e8fbf1"><i data-lucide="users"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Family Operations</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Calendar management, logistics tracking, school coordination, travel planning. Full family command center.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--coral)">
-            <span class="icon-pill" style="background:#ffe7e7"><i data-lucide="code"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Autonomous Coding</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Delegates to coding agents for overnight development. Built entire applications while sleeping. Fresh context per iteration.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--coral)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#ffe7e7"><i data-lucide="code"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Autonomous Coding</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Delegates to coding agents for overnight development. Built entire applications while sleeping. Fresh context per iteration.</p>
+            </div>
           </article>
-          <article class="cap-card" style="border-left-color:var(--teal)">
-            <span class="icon-pill" style="background:#e8fbf8"><i data-lucide="newspaper"></i></span>
-            <h3 class="mt-3 text-xl font-semibold">Content Pipeline</h3>
-            <p class="mt-2 text-sm text-[#4a4a5a]">Automated HackerNews digest, Economist EPUB generation, trend monitoring across Reddit and X. Content delivered daily.</p>
+          <article class="cap-card tilt-card" style="border-left-color:var(--teal)">
+            <div class="cap-head">
+              <div class="flex items-start gap-3">
+                <span class="icon-pill" style="background:#e8fbf8"><i data-lucide="newspaper"></i></span>
+                <h3 class="mt-1 text-xl font-semibold">Content Pipeline</h3>
+              </div>
+              <span class="cap-toggle">+</span>
+            </div>
+            <div class="cap-body">
+              <p class="text-sm text-[#4a4a5a]">Automated HackerNews digest, Economist EPUB generation, trend monitoring across Reddit and X. Content delivered daily.</p>
+            </div>
           </article>
         </div>
       </div>
@@ -722,7 +1076,7 @@
 
     <section id="stack" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-5xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">The Stack</h2>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">The Stack</h2>
         <p class="mt-3 text-[#4a4a5a]">Architecture overview of the full AI operating system.</p>
 
         <div class="stack-wrap mt-8" data-stack>
@@ -745,42 +1099,45 @@
 
     <section id="always-on" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">Always On</h2>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">Always On</h2>
         <p class="mt-3 text-[#4a4a5a]">A continuous 24/7 operating cadence.</p>
+        <div class="mt-4">
+          <span class="live-clock"><i data-lucide="clock-3" class="w-4 h-4"></i><strong id="live-clock">--:--:--</strong></span>
+        </div>
 
         <div class="rhythm mt-8">
           <div class="rhythm-line">
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="05:30">
               <div class="rhythm-dot" style="background:var(--coral)"></div>
               <p class="text-xs font-mono text-[#66667a]">5:30 AM</p>
               <p class="mt-2 text-sm">HackerNews digest generated</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="06:30">
               <div class="rhythm-dot" style="background:var(--teal)"></div>
               <p class="text-xs font-mono text-[#66667a]">6:30 AM</p>
               <p class="mt-2 text-sm">Morning brief researched, compiled, and delivered</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="half-hourly">
               <div class="rhythm-dot" style="background:var(--gold)"></div>
               <p class="text-xs font-mono text-[#66667a]">Every 30 min</p>
               <p class="mt-2 text-sm">Knowledge base auto-syncs</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="on-demand">
               <div class="rhythm-dot" style="background:var(--lavender)"></div>
               <p class="text-xs font-mono text-[#66667a]">On demand</p>
               <p class="mt-2 text-sm">Research, voice conversations, task management</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="14:00">
               <div class="rhythm-dot" style="background:var(--sky)"></div>
               <p class="text-xs font-mono text-[#66667a]">2:00 PM</p>
               <p class="mt-2 text-sm">Afternoon research brief on rotating topics</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="22:00">
               <div class="rhythm-dot" style="background:var(--mint)"></div>
               <p class="text-xs font-mono text-[#66667a]">10:00 PM</p>
               <p class="mt-2 text-sm">Evening accountability check-in</p>
             </article>
-            <article class="rhythm-point">
+            <article class="rhythm-point" data-time="overnight">
               <div class="rhythm-dot" style="background:#1f2937"></div>
               <p class="text-xs font-mono text-[#66667a]">Overnight</p>
               <p class="mt-2 text-sm">Autonomous coding runs</p>
@@ -792,7 +1149,7 @@
 
     <section id="enterprise" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
-        <h2 class="font-display text-4xl md:text-5xl font-bold">Enterprise Potential</h2>
+        <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">Enterprise Potential</h2>
         <p class="mt-3 text-[#4a4a5a]">Detailed business applications available on request</p>
         <p class="enterprise-banner mt-4">Confidential business applications — details available in person</p>
 
@@ -823,27 +1180,25 @@
 
     <section id="next" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto text-center">
-        <h2 class="font-display text-5xl md:text-6xl font-extrabold leading-tight">This is week 5. Imagine week 50.</h2>
+        <h2 class="parallax-head font-display text-5xl md:text-6xl font-extrabold leading-tight">Roadmap</h2>
 
         <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-          <article class="cap-card" style="border-left-color:var(--coral)">
+          <article class="cap-card tilt-card" style="border-left-color:var(--coral)">
             <span class="icon-pill" style="background:#ffe7e7"><i data-lucide="move-up-right"></i></span>
             <h3 class="mt-3 text-2xl font-bold">Scale</h3>
-            <p class="mt-2 text-[#4a4a5a]">From personal productivity to team-wide AI infrastructure</p>
+            <p class="mt-2 text-[#4a4a5a]">Extend the current workflows from personal use to team operations.</p>
           </article>
-          <article class="cap-card" style="border-left-color:var(--teal)">
+          <article class="cap-card tilt-card" style="border-left-color:var(--teal)">
             <span class="icon-pill" style="background:#e8fbf8"><i data-lucide="link"></i></span>
             <h3 class="mt-3 text-2xl font-bold">Integrate</h3>
-            <p class="mt-2 text-[#4a4a5a]">Connect to deal management, CRM, data rooms, and LP portals</p>
+            <p class="mt-2 text-[#4a4a5a]">Connect existing automations to CRM, deal tools, data rooms, and LP portals.</p>
           </article>
-          <article class="cap-card" style="border-left-color:var(--gold)">
+          <article class="cap-card tilt-card" style="border-left-color:var(--gold)">
             <span class="icon-pill" style="background:#fff6de"><i data-lucide="layers-3"></i></span>
             <h3 class="mt-3 text-2xl font-bold">Compound</h3>
-            <p class="mt-2 text-[#4a4a5a]">Every skill built makes the next one faster. Every document indexed makes the AI smarter.</p>
+            <p class="mt-2 text-[#4a4a5a]">Increase reuse by building on the current skills, integrations, and indexed knowledge.</p>
           </article>
         </div>
-
-        <p class="mt-10 text-xl md:text-2xl max-w-4xl mx-auto quote">The question isn't whether AI changes everything. It's whether you're building while others are waiting.</p>
       </div>
     </section>
   </main>
@@ -851,7 +1206,6 @@
   <footer class="px-6 md:px-10 lg:px-2 py-10 border-t border-[#e5e7eb]">
     <div class="max-w-6xl mx-auto text-center">
       <p class="font-medium">Built by Andres Perez with Homer AI</p>
-      <p class="mt-1 text-sm text-[#5f5f72]">Built with AI. By a human who'd never coded before.</p>
       <p class="mt-2 text-xs text-[#7b7b90]">Powered by OpenClaw + Claude</p>
       <p class="mt-1 text-xs text-[#8d8da2]">2026</p>
     </div>
@@ -863,7 +1217,7 @@
         window.lucide.createIcons();
       }
 
-      const revealTargets = document.querySelectorAll('.section-fade, [data-stack]');
+      const revealTargets = document.querySelectorAll('.section-fade');
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -909,18 +1263,27 @@
       counters.forEach((el) => counterObserver.observe(el));
 
       const orb = document.querySelector('.orb');
+      const parallaxHeads = document.querySelectorAll('.parallax-head');
       let latestY = 0;
       let frame = null;
       const updateParallax = () => {
         frame = null;
         const shift = Math.min(latestY * 0.08, 58);
-        orb.style.setProperty('--parallax', `${shift}px`);
+        if (orb) orb.style.setProperty('--parallax', `${shift}px`);
+        parallaxHeads.forEach((head) => {
+          const rect = head.getBoundingClientRect();
+          const viewportMid = window.innerHeight * 0.5;
+          const delta = (rect.top - viewportMid) * -0.04;
+          const clamp = Math.max(-10, Math.min(10, delta));
+          head.style.setProperty('--head-shift', `${clamp.toFixed(2)}px`);
+        });
       };
 
       window.addEventListener('scroll', () => {
         latestY = window.scrollY;
         if (!frame) frame = requestAnimationFrame(updateParallax);
       }, { passive: true });
+      updateParallax();
 
       const sections = document.querySelectorAll('main section[id]');
       const navLinks = Array.from(document.querySelectorAll('.nav-link'));
@@ -936,6 +1299,130 @@
       }, { threshold: 0.45 });
 
       sections.forEach((section) => sectionObserver.observe(section));
+
+      const addTapPulse = (el) => {
+        el.classList.remove('tap-pulse');
+        requestAnimationFrame(() => {
+          el.classList.add('tap-pulse');
+          setTimeout(() => el.classList.remove('tap-pulse'), 130);
+        });
+      };
+
+      document.querySelectorAll('.cap-card').forEach((card) => {
+        if (!card.querySelector('.cap-body')) return;
+        card.addEventListener('click', () => {
+          card.classList.toggle('open');
+          addTapPulse(card);
+        });
+      });
+
+      document.querySelectorAll('.week-summary').forEach((summary) => {
+        const card = summary.closest('.week-card');
+        const toggle = () => {
+          if (!card) return;
+          card.classList.toggle('open');
+          addTapPulse(card);
+        };
+        summary.addEventListener('click', toggle);
+        summary.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggle();
+          }
+        });
+      });
+
+      const statItems = Array.from(document.querySelectorAll('.stat-item'));
+      const closeStatTooltips = () => statItems.forEach((item) => item.classList.remove('show-tooltip'));
+      statItems.forEach((item) => {
+        const trigger = item.querySelector('.stat-trigger');
+        if (!trigger) return;
+        trigger.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const isOpen = item.classList.contains('show-tooltip');
+          closeStatTooltips();
+          if (!isOpen) item.classList.add('show-tooltip');
+          addTapPulse(trigger);
+        });
+      });
+
+      const heroPills = Array.from(document.querySelectorAll('[data-pill]'));
+      heroPills.forEach((pill) => {
+        let timeout = null;
+        pill.addEventListener('click', (event) => {
+          event.stopPropagation();
+          heroPills.forEach((node) => node.classList.remove('show-tooltip'));
+          pill.classList.add('show-tooltip');
+          pill.classList.add('glow');
+          if (timeout) clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            pill.classList.remove('show-tooltip');
+            pill.classList.remove('glow');
+          }, 1650);
+          addTapPulse(pill);
+        });
+      });
+
+      const stackWrap = document.querySelector('[data-stack]');
+      if (stackWrap) {
+        const stackNodes = Array.from(stackWrap.querySelectorAll('.stack-layer, .stack-arrow'));
+        const stackDiagram = stackWrap.querySelector('.stack-diagram');
+        const stackObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            stackNodes.forEach((node, index) => {
+              setTimeout(() => node.classList.add('animate-in'), index * 210);
+            });
+            const totalDelay = stackNodes.length * 210 + 240;
+            setTimeout(() => {
+              if (!stackDiagram) return;
+              stackDiagram.classList.add('pulse');
+              setTimeout(() => stackDiagram.classList.remove('pulse'), 900);
+            }, totalDelay);
+            stackObserver.unobserve(entry.target);
+          });
+        }, { threshold: 0.3 });
+        stackObserver.observe(stackWrap);
+      }
+
+      const liveClock = document.getElementById('live-clock');
+      const rhythmPoints = Array.from(document.querySelectorAll('.rhythm-point'));
+      const parseMinutes = (value, nowMinutes) => {
+        if (value === 'half-hourly') return nowMinutes - (nowMinutes % 30);
+        if (value === 'on-demand') return nowMinutes - 3;
+        if (value === 'overnight') return 23 * 60 + 30;
+        const [h, m] = value.split(':').map(Number);
+        return (h * 60) + m;
+      };
+
+      const updateLiveState = () => {
+        const now = new Date();
+        if (liveClock) {
+          liveClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        let selected = null;
+        let smallestDelta = Number.POSITIVE_INFINITY;
+        rhythmPoints.forEach((point) => {
+          const timeCode = point.getAttribute('data-time') || '';
+          const pointMinutes = parseMinutes(timeCode, nowMinutes);
+          const delta = (nowMinutes - pointMinutes + 1440) % 1440;
+          if (delta < smallestDelta) {
+            smallestDelta = delta;
+            selected = point;
+          }
+        });
+        rhythmPoints.forEach((point) => point.classList.toggle('active-now', point === selected));
+      };
+      updateLiveState();
+      setInterval(updateLiveState, 1000);
+
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('.stat-item')) closeStatTooltips();
+        if (!event.target.closest('[data-pill]')) {
+          heroPills.forEach((pill) => pill.classList.remove('show-tooltip'));
+        }
+      });
     });
   </script>
 </body>
