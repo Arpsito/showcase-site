@@ -64,6 +64,34 @@
       text-decoration: none;
     }
 
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .logo-mark {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .logo-fallback {
+      width: 34px;
+      height: 34px;
+      display: none;
+    }
+
     .section-fade {
       opacity: 0;
       transform: translateY(14px);
@@ -121,6 +149,20 @@
       box-shadow: var(--shadow-soft);
       overflow: hidden;
       isolation: isolate;
+    }
+
+    .hero-image-wrap {
+      width: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      background: #fff;
+    }
+
+    .hero-image {
+      width: 100%;
+      display: block;
     }
 
     .hero-cloud::before,
@@ -457,6 +499,21 @@
       isolation: isolate;
     }
 
+    .stack-image-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .stack-image {
+      width: 100%;
+      max-width: 960px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      background: #fff;
+    }
+
     .stack-layer {
       min-width: 270px;
       text-align: center;
@@ -769,13 +826,16 @@
   <header class="sticky top-0 z-50 nav-shell border-b border-[#e5e7eb]">
     <nav class="max-w-6xl mx-auto h-16 px-6 lg:px-2 flex items-center justify-between">
       <a href="#hero" class="inline-flex items-center gap-2">
-        <svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="1" y="1" width="62" height="62" rx="16" fill="#FFF1F1" stroke="#FFD7D7" />
-          <path d="M23 17C23 15.9 23.9 15 25 15H39C40.1 15 41 15.9 41 17V21C41 23.2 42.8 25 45 25V29C42.8 29 41 30.8 41 33V45C41 48.9 37.9 52 34 52H30C26.1 52 23 48.9 23 45V33C23 30.8 21.2 29 19 29V25C21.2 25 23 23.2 23 21V17Z" fill="#FF6B6B" />
-          <path d="M29 22H35M29 27H35M29 32H39" stroke="#FFF7F6" stroke-width="2" stroke-linecap="round" />
-          <circle cx="38.5" cy="31.5" r="2.5" fill="#2EC4B6" />
-          <path d="M41 33H46" stroke="#2EC4B6" stroke-width="2" stroke-linecap="round" />
-        </svg>
+        <span class="logo-mark">
+          <img src="assets/homer-logo.png" alt="Homer logo" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+          <svg class="logo-fallback" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="1" y="1" width="62" height="62" rx="16" fill="#FFF1F1" stroke="#FFD7D7" />
+            <path d="M23 17C23 15.9 23.9 15 25 15H39C40.1 15 41 15.9 41 17V21C41 23.2 42.8 25 45 25V29C42.8 29 41 30.8 41 33V45C41 48.9 37.9 52 34 52H30C26.1 52 23 48.9 23 45V33C23 30.8 21.2 29 19 29V25C21.2 25 23 23.2 23 21V17Z" fill="#FF6B6B" />
+            <path d="M29 22H35M29 27H35M29 32H39" stroke="#FFF7F6" stroke-width="2" stroke-linecap="round" />
+            <circle cx="38.5" cy="31.5" r="2.5" fill="#2EC4B6" />
+            <path d="M41 33H46" stroke="#2EC4B6" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </span>
         <span class="logo-wordmark">HOMER</span>
       </a>
 
@@ -806,17 +866,22 @@
           </a>
         </div>
 
-        <div class="hero-cloud" aria-label="Homer skill cloud">
-          <button class="hero-float" type="button" data-pill data-pill-detail="31 custom skills running daily" style="left:12%;top:16%;background:#fff4f4;--appear:80ms;--float-dur:8.2s;--float-y:8px;--float-x:-3px;--pill-glow:rgba(255,107,107,.45);"><i data-lucide="wrench"></i>31 Skills<span class="hero-pill-tooltip">31 custom skills running daily</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="18 live service integrations" style="left:45%;top:12%;background:#edfdfa;--appear:280ms;--float-dur:9.4s;--float-y:-7px;--float-x:3px;--pill-glow:rgba(46,196,182,.45);"><i data-lucide="plug"></i>18 Integrations<span class="hero-pill-tooltip">18 live service integrations</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Vector memory across 1,500+ chunks" style="left:65%;top:27%;background:#fff8e5;--appear:520ms;--float-dur:7.8s;--float-y:7px;--float-x:2px;--pill-glow:rgba(255,209,102,.45);"><i data-lucide="brain"></i>Open Brain<span class="hero-pill-tooltip">Vector memory across 1,500+ chunks</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Two-way voice note conversations" style="left:20%;top:39%;background:#eff6ff;--appear:760ms;--float-dur:8.9s;--float-y:-8px;--float-x:-2px;--pill-glow:rgba(96,165,250,.45);"><i data-lucide="mic"></i>Voice Ready<span class="hero-pill-tooltip">Two-way voice note conversations</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Overnight delegated coding loops" style="left:52%;top:45%;background:#f4f0ff;--appear:980ms;--float-dur:9.9s;--float-y:9px;--float-x:-3px;--pill-glow:rgba(167,139,250,.45);"><i data-lucide="code"></i>Autonomous Coding<span class="hero-pill-tooltip">Overnight delegated coding loops</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Digest and report generation automation" style="left:14%;top:63%;background:#ecfdf5;--appear:1240ms;--float-dur:8.7s;--float-y:7px;--float-x:3px;--pill-glow:rgba(52,211,153,.45);"><i data-lucide="newspaper"></i>Daily Content<span class="hero-pill-tooltip">Digest and report generation automation</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Running 24/7 since Jan 27, 2026" style="left:43%;top:72%;background:#fff2d8;--appear:1500ms;--float-dur:9.1s;--float-y:-8px;--float-x:2px;--pill-glow:rgba(245,158,11,.45);"><i data-lucide="clock"></i>24/7 Runtime<span class="hero-pill-tooltip">Running 24/7 since Jan 27, 2026</span></button>
-          <button class="hero-float" type="button" data-pill data-pill-detail="Automated security checks and logs" style="left:71%;top:62%;background:#f4f8ff;--appear:1760ms;--float-dur:8.4s;--float-y:8px;--float-x:-2px;--pill-glow:rgba(59,130,246,.45);"><i data-lucide="shield"></i>Security<span class="hero-pill-tooltip">Automated security checks and logs</span></button>
-          <div class="absolute bottom-4 right-4 z-10">
-            <span class="hero-tag">Tag cloud of live capabilities</span>
+        <div>
+          <div class="hero-image-wrap">
+            <img src="assets/hero.jpg" alt="Homer setup with iPhone and Mac mini" class="hero-image" onerror="this.style.display='none';this.parentElement.nextElementSibling.style.display='block';" />
+          </div>
+          <div class="hero-cloud mt-4" aria-label="Homer skill cloud" style="display:none;">
+            <button class="hero-float" type="button" data-pill data-pill-detail="31 custom skills running daily" style="left:12%;top:16%;background:#fff4f4;--appear:80ms;--float-dur:8.2s;--float-y:8px;--float-x:-3px;--pill-glow:rgba(255,107,107,.45);"><i data-lucide="wrench"></i>31 Skills<span class="hero-pill-tooltip">31 custom skills running daily</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="18 live service integrations" style="left:45%;top:12%;background:#edfdfa;--appear:280ms;--float-dur:9.4s;--float-y:-7px;--float-x:3px;--pill-glow:rgba(46,196,182,.45);"><i data-lucide="plug"></i>18 Integrations<span class="hero-pill-tooltip">18 live service integrations</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Vector memory across 1,500+ chunks" style="left:65%;top:27%;background:#fff8e5;--appear:520ms;--float-dur:7.8s;--float-y:7px;--float-x:2px;--pill-glow:rgba(255,209,102,.45);"><i data-lucide="brain"></i>Open Brain<span class="hero-pill-tooltip">Vector memory across 1,500+ chunks</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Two-way voice note conversations" style="left:20%;top:39%;background:#eff6ff;--appear:760ms;--float-dur:8.9s;--float-y:-8px;--float-x:-2px;--pill-glow:rgba(96,165,250,.45);"><i data-lucide="mic"></i>Voice Ready<span class="hero-pill-tooltip">Two-way voice note conversations</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Overnight delegated coding loops" style="left:52%;top:45%;background:#f4f0ff;--appear:980ms;--float-dur:9.9s;--float-y:9px;--float-x:-3px;--pill-glow:rgba(167,139,250,.45);"><i data-lucide="code"></i>Autonomous Coding<span class="hero-pill-tooltip">Overnight delegated coding loops</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Digest and report generation automation" style="left:14%;top:63%;background:#ecfdf5;--appear:1240ms;--float-dur:8.7s;--float-y:7px;--float-x:3px;--pill-glow:rgba(52,211,153,.45);"><i data-lucide="newspaper"></i>Daily Content<span class="hero-pill-tooltip">Digest and report generation automation</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Running 24/7 since Jan 27, 2026" style="left:43%;top:72%;background:#fff2d8;--appear:1500ms;--float-dur:9.1s;--float-y:-8px;--float-x:2px;--pill-glow:rgba(245,158,11,.45);"><i data-lucide="clock"></i>24/7 Runtime<span class="hero-pill-tooltip">Running 24/7 since Jan 27, 2026</span></button>
+            <button class="hero-float" type="button" data-pill data-pill-detail="Automated security checks and logs" style="left:71%;top:62%;background:#f4f8ff;--appear:1760ms;--float-dur:8.4s;--float-y:8px;--float-x:-2px;--pill-glow:rgba(59,130,246,.45);"><i data-lucide="shield"></i>Security<span class="hero-pill-tooltip">Automated security checks and logs</span></button>
+            <div class="absolute bottom-4 right-4 z-10">
+              <span class="hero-tag">Tag cloud of live capabilities</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1080,7 +1145,10 @@
         <p class="mt-3 text-[#4a4a5a]">Architecture overview of the full AI operating system.</p>
 
         <div class="stack-wrap mt-8" data-stack>
-          <div class="stack-diagram">
+          <div class="stack-image-wrap">
+            <img src="assets/architecture.jpg" alt="Homer architecture isometric diagram" class="stack-image" onerror="this.style.display='none';this.parentElement.nextElementSibling.style.display='grid';" />
+          </div>
+          <div class="stack-diagram" style="display:none;">
             <div class="stack-layer" style="background:#fff1f1">[You]</div>
             <div class="stack-arrow"></div>
             <div class="stack-layer" style="background:#ebfaf8">[WhatsApp / Voice]</div>
