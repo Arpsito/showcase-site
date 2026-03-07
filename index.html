@@ -324,29 +324,26 @@
     }
 
     .timeline-shell {
-      overflow-x: auto;
-      padding-bottom: 0.35rem;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
+      padding-bottom: 0;
     }
 
     .timeline-track {
-      min-width: 1000px;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(180px, 1fr));
-      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
       position: relative;
-      padding-top: 2.2rem;
+      padding-left: 2.8rem;
     }
 
     .timeline-track::before {
       content: "";
       position: absolute;
-      left: 3rem;
-      right: 3rem;
-      top: 1.05rem;
-      height: 2px;
-      background: #d6dae2;
+      left: 1.08rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--coral), var(--teal), #efb930, var(--lavender), var(--mint));
     }
 
     .week-dot {
@@ -362,8 +359,9 @@
       font-weight: 700;
       box-shadow: 0 8px 16px rgba(20, 20, 40, 0.14);
       position: absolute;
-      top: -1.2rem;
-      left: 1rem;
+      left: -2.8rem;
+      top: 1.05rem;
+      z-index: 2;
     }
 
     .week-card {
@@ -374,9 +372,13 @@
       border-radius: 16px;
       padding: 1.05rem 1rem 0.95rem;
       box-shadow: 0 12px 24px rgba(20, 20, 40, 0.06);
-      min-height: 220px;
-      scroll-snap-align: start;
+      margin-bottom: 1rem;
       transition: transform 200ms ease, box-shadow 200ms ease;
+      cursor: pointer;
+    }
+
+    .week-card:hover {
+      box-shadow: 0 14px 28px rgba(20, 20, 40, 0.1);
     }
 
     .week-summary {
@@ -389,8 +391,8 @@
     }
 
     .week-toggle {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
@@ -400,7 +402,17 @@
       color: #616173;
       line-height: 1;
       transform: rotate(0deg);
-      transition: transform 180ms ease, border-color 180ms ease;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      flex-shrink: 0;
+    }
+
+    .week-card:not(.open) .week-toggle {
+      animation: pulse-toggle 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-toggle {
+      0%, 100% { border-color: #d5dae6; }
+      50% { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15); }
     }
 
     .week-details {
@@ -416,6 +428,8 @@
     .week-card.open .week-toggle {
       transform: rotate(45deg);
       border-color: #bfc7d8;
+      background: #f1f3f8;
+      animation: none;
     }
 
     .cap-grid {
@@ -720,21 +734,11 @@
 
     @media (max-width: 768px) {
       .timeline-track {
-        min-width: max-content;
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(260px, 82vw);
-        grid-template-columns: none;
-        padding-top: 2.2rem;
-      }
-
-      .timeline-shell {
-        padding-bottom: 0.9rem;
+        padding-left: 2.4rem;
       }
 
       .week-dot {
-        top: -1.2rem;
-        left: 1rem;
-        right: auto;
+        left: -2.4rem;
       }
 
       .cap-grid,
@@ -935,7 +939,7 @@
     <section id="journey" class="px-6 md:px-10 lg:px-2 py-16 section-fade">
       <div class="max-w-6xl mx-auto">
         <h2 class="parallax-head font-display text-4xl md:text-5xl font-bold">The Journey</h2>
-        <p class="mt-3 text-[#4a4a5a]">Build timeline.</p>
+        <p class="mt-3 text-[#4a4a5a]">Build timeline. <span style="color:var(--coral);font-size:0.85rem">Tap each week to explore →</span></p>
 
         <div class="timeline-shell mt-8">
           <div class="timeline-track">
