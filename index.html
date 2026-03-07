@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homer Showcase</title>
+  <meta name="description" content="How a PE fundraiser built a 24/7 AI ecosystem from scratch in 5 weeks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #ffffff;
+      --muted: #94a3b8;
+      --accent-a: #3b82f6;
+      --accent-b: #06b6d4;
+      --accent-c: #8b5cf6;
+      --accent-d: #ec4899;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12), transparent 42%),
+        radial-gradient(circle at 80% 0%, rgba(236, 72, 153, 0.1), transparent 38%),
+        radial-gradient(circle at 50% 100%, rgba(6, 182, 212, 0.08), transparent 40%),
+        var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .mesh {
+      position: absolute;
+      inset: -25% -10% auto;
+      height: 90vh;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.22), transparent 40%),
+        radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.2), transparent 35%),
+        radial-gradient(circle at 55% 70%, rgba(6, 182, 212, 0.18), transparent 42%);
+      filter: blur(42px);
+      transform: translateY(var(--parallax, 0px));
+      transition: transform 120ms linear;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .gradient-text {
+      background: linear-gradient(110deg, var(--accent-a), var(--accent-b), var(--accent-c), var(--accent-d));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .section-fade {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .section-fade.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .glow-hover {
+      position: relative;
+      transition: border-color 240ms ease, transform 240ms ease;
+    }
+
+    .glow-hover::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(120deg, rgba(59, 130, 246, 0.35), rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.35));
+      opacity: 0;
+      transition: opacity 240ms ease;
+      z-index: -1;
+      filter: blur(16px);
+    }
+
+    .glow-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.45);
+    }
+
+    .glow-hover:hover::before {
+      opacity: 1;
+    }
+
+    .scroll-arrow {
+      width: 24px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      position: relative;
+    }
+
+    .scroll-arrow::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      transform: translateX(-50%);
+      animation: wheel 1.6s infinite;
+    }
+
+    @keyframes wheel {
+      0% { opacity: 0; transform: translate(-50%, 0); }
+      25% { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, 17px); }
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(59,130,246,0.7), rgba(236,72,153,0.55));
+    }
+
+    .stack-item {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+      transition: opacity 500ms ease, transform 500ms ease;
+      transition-delay: calc(var(--i) * 110ms);
+    }
+
+    .stack-wrap.visible .stack-item {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .connector {
+      color: rgba(148, 163, 184, 0.7);
+      font-size: 20px;
+      line-height: 1;
+      margin: 8px 0;
+    }
+
+    .activity-item::before {
+      content: "";
+      position: absolute;
+      left: -31px;
+      top: 7px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(120deg, var(--accent-a), var(--accent-b));
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+      animation: pulse 2.4s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.55); }
+      70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+
+    .placeholder {
+      opacity: 0.85;
+      border-style: dashed;
+    }
+
+    .placeholder .lock-overlay {
+      background: linear-gradient(140deg, rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.75));
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+
+  <main class="relative">
+    <section id="hero" class="min-h-screen flex items-center px-6 py-24 md:px-12 lg:px-20">
+      <div class="max-w-6xl mx-auto w-full text-center section-fade visible">
+        <p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs tracking-[0.22em] uppercase text-slate-300">AI Transformation Showcase</p>
+        <h1 class="mt-8 text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05]">5 Weeks. Zero Code. One AI Agent.</h1>
+        <p class="mt-6 text-lg md:text-2xl text-slate-300 max-w-3xl mx-auto">How a PE fundraiser built a 24/7 AI ecosystem from scratch</p>
+        <div class="mt-10 flex items-center justify-center gap-3 text-sm text-slate-300">
+          <span class="h-px w-16 bg-gradient-to-r from-transparent to-cyan-400/80"></span>
+          <span>Built with OpenClaw, custom skills, and relentless iteration</span>
+          <span class="h-px w-16 bg-gradient-to-l from-transparent to-violet-400/80"></span>
+        </div>
+        <a href="#numbers" class="mt-24 inline-flex flex-col items-center gap-3 text-slate-300 hover:text-white transition-colors" aria-label="Scroll to next section">
+          <span class="text-xs tracking-[0.2em] uppercase">Scroll</span>
+          <span class="scroll-arrow"></span>
+        </a>
+      </div>
+    </section>
+
+    <section id="numbers" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight"><span class="gradient-text">By The Numbers</span></h2>
+        <p class="mt-3 text-slate-300">Measured output in 5 weeks of focused AI system building.</p>
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">🛠️</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="31" data-suffix="">0</span></p>
+            <p class="mt-2 text-slate-300">Custom AI Skills Built</p>
+          </article>
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">📚</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="293" data-suffix="">0</span></p>
+            <p class="mt-2 text-slate-300">Knowledge Base Documents</p>
+          </article>
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">🔌</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="18" data-suffix="">0</span></p>
+            <p class="mt-2 text-slate-300">Platform Integrations</p>
+          </article>
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">⏱️</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="40" data-suffix="+">0</span></p>
+            <p class="mt-2 text-slate-300">Days Running 24/7</p>
+          </article>
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">🧩</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="1500" data-suffix="+">0</span></p>
+            <p class="mt-2 text-slate-300">Searchable Knowledge Chunks</p>
+          </article>
+          <article class="glass rounded-2xl p-6">
+            <p class="text-2xl">⚙️</p>
+            <p class="mt-4 text-4xl font-extrabold"><span class="counter" data-target="6" data-suffix="">0</span></p>
+            <p class="mt-2 text-slate-300">Daily Automated Workflows</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="journey" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The Journey</h2>
+        <p class="mt-3 text-slate-300">A 5-week build sprint from setup to autonomous operation.</p>
+        <div class="mt-10 relative timeline pl-10 space-y-6">
+          <article class="glass rounded-2xl p-6 relative">
+            <span class="absolute -left-[35px] top-6 inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/90 text-xs">1</span>
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Week 1 (Jan 27 - Feb 2)</p>
+            <h3 class="mt-2 text-2xl font-bold">Foundation</h3>
+            <ul class="mt-3 text-slate-300 list-disc list-inside space-y-1">
+              <li>Mac mini setup, OpenClaw installation, security hardening</li>
+              <li>Configured WhatsApp, Gmail, Calendar integrations</li>
+              <li>Built first 4 custom skills and Obsidian vault with Sync</li>
+            </ul>
+          </article>
+          <article class="glass rounded-2xl p-6 relative">
+            <span class="absolute -left-[35px] top-6 inline-flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/90 text-xs">2</span>
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Week 2 (Feb 3 - Feb 9)</p>
+            <h3 class="mt-2 text-2xl font-bold">Acceleration</h3>
+            <ul class="mt-3 text-slate-300 list-disc list-inside space-y-1">
+              <li>Voice enhancement with ElevenLabs TTS and Codex CLI integration</li>
+              <li>1Password secret management + automated morning briefings</li>
+              <li>Solo RPG catalog workflow, 15 games cataloged</li>
+            </ul>
+          </article>
+          <article class="glass rounded-2xl p-6 relative">
+            <span class="absolute -left-[35px] top-6 inline-flex h-7 w-7 items-center justify-center rounded-full bg-violet-500/90 text-xs">3</span>
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Week 3 (Feb 10 - Feb 16)</p>
+            <h3 class="mt-2 text-2xl font-bold">Intelligence</h3>
+            <ul class="mt-3 text-slate-300 list-disc list-inside space-y-1">
+              <li>Self-improvement system, batch 2 skills, and People CRM</li>
+              <li>Semantic memory search and Family Hub PWA built in 2 hours</li>
+              <li>Family logistics, HN deep dive, weekly review automation</li>
+            </ul>
+          </article>
+          <article class="glass rounded-2xl p-6 relative">
+            <span class="absolute -left-[35px] top-6 inline-flex h-7 w-7 items-center justify-center rounded-full bg-pink-500/90 text-xs">4</span>
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Week 4 (Feb 17 - Feb 23)</p>
+            <h3 class="mt-2 text-2xl font-bold">Scale</h3>
+            <ul class="mt-3 text-slate-300 list-disc list-inside space-y-1">
+              <li>Telegram multi-channel architecture with autonomous coding loops</li>
+              <li>Parallel module building (Dark Factory) and QA harness</li>
+              <li>Trend research and content analysis workflows</li>
+            </ul>
+          </article>
+          <article class="glass rounded-2xl p-6 relative">
+            <span class="absolute -left-[35px] top-6 inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/90 text-xs">5</span>
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-300">Week 5 (Feb 24 - Mar 7)</p>
+            <h3 class="mt-2 text-2xl font-bold">Mastery</h3>
+            <ul class="mt-3 text-slate-300 list-disc list-inside space-y-1">
+              <li>MCP knowledge base (Open Brain) with vector search</li>
+              <li>Economist EPUB pipeline, HomerSec, and voice cloning</li>
+              <li>Stable 24/7 autonomous operation</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="capabilities" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">What Homer Does</h2>
+        <p class="mt-3 text-slate-300">Core capabilities that run daily without manual intervention.</p>
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">🌅</p><h3 class="mt-4 text-xl font-semibold">Morning Intelligence Brief</h3><p class="mt-2 text-sm text-slate-300">AI-generated daily briefing covering weather, calendar, tasks, world news, AI developments, and health metrics. Delivered as audio via WhatsApp at 6:30 AM.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">🔍</p><h3 class="mt-4 text-xl font-semibold">Research on Demand</h3><p class="mt-2 text-sm text-slate-300">Deep-dive research briefs on any topic, saved to a searchable knowledge base. Rotating daily topics: AI, industry trends, entertainment.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">🎙️</p><h3 class="mt-4 text-xl font-semibold">Voice Interaction</h3><p class="mt-2 text-sm text-slate-300">Natural voice conversations via WhatsApp. Custom cloned voice. Responds to voice notes with voice. 2-way audio dialogue.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">🧠</p><h3 class="mt-4 text-xl font-semibold">Knowledge Base (Open Brain)</h3><p class="mt-2 text-sm text-slate-300">MCP-compatible vector database. 293 documents, 1,500+ searchable chunks. Any AI tool can query it via universal protocol.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">🔒</p><h3 class="mt-4 text-xl font-semibold">Security Engine</h3><p class="mt-2 text-sm text-slate-300">Custom-built security guardrails. Pattern matching, audit logging, supply chain protection. 1,000 checks in 6ms.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">👨‍👩‍👧‍👦</p><h3 class="mt-4 text-xl font-semibold">Family Operations</h3><p class="mt-2 text-sm text-slate-300">Calendar management, logistics tracking, school coordination, travel planning. Full family command center.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">💻</p><h3 class="mt-4 text-xl font-semibold">Autonomous Coding</h3><p class="mt-2 text-sm text-slate-300">Delegates to coding agents for overnight development. Built entire applications while sleeping. Fresh context per iteration.</p></article>
+          <article class="glass glow-hover rounded-2xl p-6"><p class="text-2xl">📰</p><h3 class="mt-4 text-xl font-semibold">Content Pipeline</h3><p class="mt-2 text-sm text-slate-300">Automated HackerNews digest, Economist EPUB generation, trend monitoring across Reddit and X. Content delivered daily.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">The Stack</h2>
+        <p class="mt-3 text-slate-300">Architecture overview of the full AI operating system.</p>
+        <div class="stack-wrap mt-10 glass rounded-3xl p-6 md:p-10 text-center" data-stack>
+          <div class="stack-item glass rounded-xl p-4" style="--i:0">[You] ↔ [WhatsApp / Voice] ↔ [Homer (AI Agent)]</div>
+          <div class="stack-item connector" style="--i:1">↓</div>
+          <div class="stack-item glass rounded-xl p-4" style="--i:2">[OpenClaw Platform]</div>
+          <div class="stack-item connector" style="--i:3">↓</div>
+          <div class="stack-item glass rounded-xl p-4" style="--i:4">[31 Custom Skills + 18 Integrations]</div>
+          <div class="stack-item connector" style="--i:5">↓</div>
+          <div class="stack-item glass rounded-xl p-4" style="--i:6">[Obsidian Vault | Open Brain | Family Hub | Automation]</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="always-on" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight"><span class="gradient-text">Always On</span></h2>
+        <p class="mt-3 text-slate-300">A continuous 24/7 operating cadence.</p>
+        <div class="mt-10 pl-8 border-l border-slate-700/80 space-y-6">
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">5:30 AM</p><p class="mt-1">HackerNews digest generated</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">6:30 AM</p><p class="mt-1">Morning brief researched, compiled, and delivered</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">Every 30 min</p><p class="mt-1">Knowledge base auto-syncs</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">On demand</p><p class="mt-1">Research, voice conversations, task management</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">2:00 PM</p><p class="mt-1">Afternoon research brief on rotating topics</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">10:00 PM</p><p class="mt-1">Evening accountability check-in</p></article>
+          <article class="activity-item relative glass rounded-xl p-5"><p class="text-sm text-cyan-300">Overnight</p><p class="mt-1">Autonomous coding runs</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="enterprise" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Enterprise Potential</h2>
+        <p class="mt-3 text-slate-300">Detailed business applications available on request</p>
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+          <article class="placeholder glass rounded-2xl p-6 relative overflow-hidden"><div class="lock-overlay absolute top-4 right-4 rounded-lg px-2 py-1 text-xs">🔒</div><h3 class="text-xl font-semibold">🔒 Deal Intelligence</h3><p class="mt-2 text-slate-300">Placeholder for deal-specific applications</p></article>
+          <article class="placeholder glass rounded-2xl p-6 relative overflow-hidden"><div class="lock-overlay absolute top-4 right-4 rounded-lg px-2 py-1 text-xs">🔒</div><h3 class="text-xl font-semibold">🔒 LP Relations</h3><p class="mt-2 text-slate-300">Placeholder for LP management applications</p></article>
+          <article class="placeholder glass rounded-2xl p-6 relative overflow-hidden"><div class="lock-overlay absolute top-4 right-4 rounded-lg px-2 py-1 text-xs">🔒</div><h3 class="text-xl font-semibold">🔒 Market Analysis</h3><p class="mt-2 text-slate-300">Placeholder for market research applications</p></article>
+          <article class="placeholder glass rounded-2xl p-6 relative overflow-hidden"><div class="lock-overlay absolute top-4 right-4 rounded-lg px-2 py-1 text-xs">🔒</div><h3 class="text-xl font-semibold">🔒 Team Productivity</h3><p class="mt-2 text-slate-300">Placeholder for team workflow applications</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="next" class="px-6 md:px-12 lg:px-20 py-20 section-fade">
+      <div class="max-w-6xl mx-auto text-center">
+        <h2 class="text-4xl md:text-6xl font-black tracking-tight">This is week 5. <span class="gradient-text">Imagine week 50.</span></h2>
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+          <article class="glass rounded-2xl p-6"><h3 class="text-2xl font-bold">Scale</h3><p class="mt-2 text-slate-300">From personal productivity to team-wide AI infrastructure</p></article>
+          <article class="glass rounded-2xl p-6"><h3 class="text-2xl font-bold">Integrate</h3><p class="mt-2 text-slate-300">Connect to deal management, CRM, data rooms, and LP portals</p></article>
+          <article class="glass rounded-2xl p-6"><h3 class="text-2xl font-bold">Compound</h3><p class="mt-2 text-slate-300">Every skill built makes the next one faster. Every document indexed makes the AI smarter.</p></article>
+        </div>
+        <p class="mt-10 text-xl md:text-2xl text-slate-200 max-w-4xl mx-auto">The question isn't whether AI changes everything. It's whether you're building while others are waiting.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="px-6 md:px-12 lg:px-20 py-10 border-t border-white/10">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="text-slate-100">Built with AI. By a human who'd never coded before.</p>
+      <p class="mt-2 text-xs text-slate-400">Powered by OpenClaw + Claude</p>
+    </div>
+  </footer>
+
+  <script>
+    const revealTargets = document.querySelectorAll('.section-fade, [data-stack]');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.18 });
+
+    revealTargets.forEach((node) => {
+      if (!node.classList.contains('visible')) {
+        revealObserver.observe(node);
+      }
+    });
+
+    const counters = document.querySelectorAll('.counter');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = Number(el.dataset.target || 0);
+        const suffix = el.dataset.suffix || '';
+        const duration = 2000;
+        const start = performance.now();
+
+        const tick = (now) => {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const value = Math.floor(target * eased);
+          el.textContent = value.toLocaleString() + suffix;
+          if (p < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = target.toLocaleString() + suffix;
+          }
+        };
+
+        requestAnimationFrame(tick);
+        counterObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach((el) => counterObserver.observe(el));
+
+    const mesh = document.querySelector('.mesh');
+    let latestY = 0;
+    let frame = null;
+
+    const updateParallax = () => {
+      frame = null;
+      const shift = Math.min(latestY * 0.16, 120);
+      mesh.style.setProperty('--parallax', `${shift}px`);
+    };
+
+    window.addEventListener('scroll', () => {
+      latestY = window.scrollY;
+      if (!frame) frame = requestAnimationFrame(updateParallax);
+    }, { passive: true });
+  </script>
+</body>
+</html>
