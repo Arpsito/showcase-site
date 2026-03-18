@@ -111,14 +111,31 @@
 
     .nav-link {
       color: #66667a;
-      border-bottom: 2px solid transparent;
-      transition: color 180ms ease, border-color 180ms ease;
+      position: relative;
+      transition: color 180ms ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--coral);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 250ms ease;
     }
 
     .nav-link:hover,
     .nav-link.active {
       color: var(--text);
-      border-color: var(--coral);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: scaleX(1);
     }
 
     .logo-wordmark {
@@ -688,12 +705,7 @@
       transition: transform 120ms ease;
     }
 
-    @media (hover: hover) {
-      .tilt-card:hover {
-        transform: perspective(900px) rotateX(1.4deg) rotateY(-1.4deg) translateY(-2px);
-        box-shadow: var(--shadow-hover);
-      }
-    }
+    /* 3D tilt handled by JS mousemove */
 
     @media (max-width: 1200px) {
       .cap-grid {
@@ -822,9 +834,132 @@
       }
     }
 
+    /* Scroll progress bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--coral), var(--lavender), var(--sky));
+      z-index: 100;
+      transform-origin: left;
+      transform: scaleX(var(--progress, 0));
+    }
+
+    /* Hero animated gradient */
+    .hero-gradient {
+      background-image: linear-gradient(135deg,
+        rgba(255,107,107,0.06) 0%,
+        rgba(167,139,250,0.06) 33%,
+        rgba(96,165,250,0.06) 66%,
+        rgba(255,107,107,0.06) 100%);
+      background-size: 300% 300%;
+      animation: gradient-shift 8s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Section dividers */
+    .section-divider {
+      height: 1px;
+      max-width: 72%;
+      margin: 0 auto;
+      background: linear-gradient(90deg, transparent, var(--coral), var(--lavender), var(--sky), transparent);
+      background-size: 200% 100%;
+      animation: shimmer-flow 3s linear infinite;
+    }
+
+    @keyframes shimmer-flow {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Card shine overlay */
+    .card-shine {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(250px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255,255,255,0.35), transparent 60%);
+      opacity: 0;
+      transition: opacity 300ms ease;
+      pointer-events: none;
+      z-index: 2;
+      border-radius: inherit;
+    }
+
+    /* Staggered reveal children */
+    .stagger-child {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 400ms ease, transform 400ms ease;
+    }
+
+    .stagger-child.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Slide direction variants */
+    .section-fade.from-left {
+      transform: translateX(-24px);
+    }
+
+    .section-fade.from-right {
+      transform: translateX(24px);
+    }
+
+    .section-fade.from-left.visible,
+    .section-fade.from-right.visible {
+      transform: translateX(0);
+    }
+
+    /* Button lift on hover */
+    .scroll-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(20,20,40,0.12);
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      html { scroll-behavior: auto; }
+      .scroll-progress { display: none; }
+      .section-fade,
+      .section-fade.from-left,
+      .section-fade.from-right {
+        opacity: 1;
+        transform: none;
+      }
+      .stagger-child {
+        opacity: 1;
+        transform: none;
+      }
+      .section-divider { animation: none; }
+      .hero-gradient { animation: none; }
+      .card-shine { display: none; }
+      .hero-float {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+      .parallax-head { transform: none !important; }
+      .orb { transform: none !important; }
+    }
+
   </style>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"></div>
   <div class="orb" aria-hidden="true"></div>
 
   <header class="sticky top-0 z-50 nav-shell border-b border-[#e5e7eb]">
@@ -857,7 +992,7 @@
   </header>
 
   <main>
-    <section id="hero" class="px-6 md:px-10 lg:px-2 py-14 md:py-20 section-fade visible">
+    <section id="hero" class="px-6 md:px-10 lg:px-2 py-14 md:py-20 section-fade visible hero-gradient">
       <div class="max-w-6xl mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
         <div>
           <p class="inline-flex text-xs tracking-[0.2em] uppercase text-[#6f6f82] font-semibold border border-[#e6e8ee] rounded-full px-3 py-1">AI System Showcase</p>
@@ -1483,26 +1618,64 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) {
-        window.lucide.createIcons();
-      }
+      if (window.lucide) window.lucide.createIcons();
 
+      const prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* --- Scroll progress bar --- */
+      const progressBar = document.querySelector('.scroll-progress');
+      const docH = () => document.documentElement.scrollHeight - window.innerHeight;
+
+      /* --- Section dividers (injected between sections) --- */
+      const mainSections = document.querySelectorAll('main > section');
+      mainSections.forEach((sec, i) => {
+        if (i === 0) return;
+        const div = document.createElement('div');
+        div.className = 'section-divider';
+        div.setAttribute('aria-hidden', 'true');
+        sec.parentNode.insertBefore(div, sec);
+      });
+
+      /* --- Staggered reveals with alternating slide directions --- */
       const revealTargets = document.querySelectorAll('.section-fade');
-      const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.16 });
+      const dirs = ['', 'from-left', 'from-right'];
+      let dirIdx = 0;
 
-      revealTargets.forEach((node) => {
-        if (!node.classList.contains('visible')) {
-          revealObserver.observe(node);
+      revealTargets.forEach((section) => {
+        if (section.classList.contains('visible')) return;
+        if (!prefersRM) section.classList.add(dirs[dirIdx % 3]);
+        dirIdx++;
+
+        /* Mark stagger children inside unrevealed sections */
+        if (!prefersRM) {
+          section.querySelectorAll('.stat-item, .cap-card, .week-card, .rhythm-point, .placeholder-card').forEach((el) => {
+            el.classList.add('stagger-child');
+          });
         }
       });
 
+      /* Also mark roadmap cards */
+      if (!prefersRM) {
+        document.querySelectorAll('#next article').forEach((el) => el.classList.add('stagger-child'));
+      }
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+          const children = entry.target.querySelectorAll('.stagger-child');
+          children.forEach((child, i) => {
+            setTimeout(() => child.classList.add('revealed'), i * 120);
+          });
+          revealObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.12 });
+
+      revealTargets.forEach((node) => {
+        if (!node.classList.contains('visible')) revealObserver.observe(node);
+      });
+
+      /* --- Counter animation --- */
       const counters = document.querySelectorAll('.counter');
       const counterObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -1512,64 +1685,55 @@
           const suffix = el.dataset.suffix || '';
           const duration = 2000;
           const start = performance.now();
-
           const tick = (now) => {
             const p = Math.min((now - start) / duration, 1);
             const eased = 1 - Math.pow(1 - p, 3);
-            const value = Math.floor(target * eased);
-            el.textContent = value.toLocaleString() + suffix;
-            if (p < 1) {
-              requestAnimationFrame(tick);
-            } else {
-              el.textContent = target.toLocaleString() + suffix;
-            }
+            el.textContent = Math.floor(target * eased).toLocaleString() + suffix;
+            if (p < 1) requestAnimationFrame(tick);
+            else el.textContent = target.toLocaleString() + suffix;
           };
-
           requestAnimationFrame(tick);
           counterObserver.unobserve(el);
         });
       }, { threshold: 0.45 });
-
       counters.forEach((el) => counterObserver.observe(el));
 
+      /* --- Parallax --- */
       const orb = document.querySelector('.orb');
       const parallaxHeads = document.querySelectorAll('.parallax-head');
-      let latestY = 0;
-      let frame = null;
+      let latestY = 0, frame = null;
       const updateParallax = () => {
         frame = null;
+        if (prefersRM) return;
         const shift = Math.min(latestY * 0.08, 58);
         if (orb) orb.style.setProperty('--parallax', `${shift}px`);
         parallaxHeads.forEach((head) => {
           const rect = head.getBoundingClientRect();
-          const viewportMid = window.innerHeight * 0.5;
-          const delta = (rect.top - viewportMid) * -0.04;
-          const clamp = Math.max(-10, Math.min(10, delta));
-          head.style.setProperty('--head-shift', `${clamp.toFixed(2)}px`);
+          const delta = (rect.top - window.innerHeight * 0.5) * -0.04;
+          head.style.setProperty('--head-shift', `${Math.max(-10, Math.min(10, delta)).toFixed(2)}px`);
         });
       };
 
       window.addEventListener('scroll', () => {
         latestY = window.scrollY;
+        if (progressBar) progressBar.style.transform = `scaleX(${Math.min(latestY / docH(), 1)})`;
         if (!frame) frame = requestAnimationFrame(updateParallax);
       }, { passive: true });
       updateParallax();
 
+      /* --- Nav active state --- */
       const sections = document.querySelectorAll('main section[id]');
       const navLinks = Array.from(document.querySelectorAll('.nav-link'));
       const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           const id = entry.target.getAttribute('id');
-          navLinks.forEach((link) => {
-            const match = link.getAttribute('href') === `#${id}`;
-            link.classList.toggle('active', Boolean(match));
-          });
+          navLinks.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === `#${id}`));
         });
       }, { threshold: 0.45 });
+      sections.forEach((s) => sectionObserver.observe(s));
 
-      sections.forEach((section) => sectionObserver.observe(section));
-
+      /* --- Tap pulse --- */
       const addTapPulse = (el) => {
         el.classList.remove('tap-pulse');
         requestAnimationFrame(() => {
@@ -1578,6 +1742,60 @@
         });
       };
 
+      /* --- 3D tilt cards with shine overlay --- */
+      const tiltCards = document.querySelectorAll('.tilt-card');
+      const hasHover = window.matchMedia('(hover: hover)').matches;
+
+      if (hasHover && !prefersRM) {
+        tiltCards.forEach((card) => {
+          const shine = document.createElement('div');
+          shine.className = 'card-shine';
+          card.style.position = 'relative';
+          card.style.overflow = 'hidden';
+          card.appendChild(shine);
+
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            const ry = ((x - cx) / cx) * 6;
+            const rx = ((cy - y) / cy) * 6;
+            card.style.transform = `perspective(800px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(-2px)`;
+            card.style.boxShadow = '0 18px 34px rgba(255,107,107,0.14)';
+            shine.style.setProperty('--mx', `${x}px`);
+            shine.style.setProperty('--my', `${y}px`);
+            shine.style.opacity = '1';
+          });
+
+          card.addEventListener('mouseleave', () => {
+            card.style.transition = 'transform 400ms cubic-bezier(0.2,0.9,0.3,1), box-shadow 400ms ease';
+            card.style.transform = '';
+            card.style.boxShadow = '';
+            shine.style.opacity = '0';
+            setTimeout(() => { card.style.transition = ''; }, 400);
+          });
+        });
+      }
+
+      /* Touch: subtle scale on mobile */
+      if (!hasHover && !prefersRM) {
+        tiltCards.forEach((card) => {
+          card.addEventListener('touchstart', () => {
+            card.style.transform = 'scale(1.02)';
+            card.style.transition = 'transform 150ms ease';
+          }, { passive: true });
+          card.addEventListener('touchend', () => {
+            setTimeout(() => {
+              card.style.transform = '';
+              setTimeout(() => { card.style.transition = ''; }, 150);
+            }, 100);
+          }, { passive: true });
+        });
+      }
+
+      /* --- Cap card toggle --- */
       document.querySelectorAll('.cap-card').forEach((card) => {
         if (!card.querySelector('.cap-body')) return;
         card.addEventListener('click', () => {
@@ -1586,29 +1804,24 @@
         });
       });
 
+      /* --- Week card toggle --- */
       document.querySelectorAll('.week-summary').forEach((summary) => {
         const card = summary.closest('.week-card');
-        const toggle = () => {
-          if (!card) return;
-          card.classList.toggle('open');
-          addTapPulse(card);
-        };
+        const toggle = () => { if (card) { card.classList.toggle('open'); addTapPulse(card); } };
         summary.addEventListener('click', toggle);
-        summary.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            toggle();
-          }
+        summary.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
         });
       });
 
+      /* --- Stat tooltips --- */
       const statItems = Array.from(document.querySelectorAll('.stat-item'));
-      const closeStatTooltips = () => statItems.forEach((item) => item.classList.remove('show-tooltip'));
+      const closeStatTooltips = () => statItems.forEach((i) => i.classList.remove('show-tooltip'));
       statItems.forEach((item) => {
         const trigger = item.querySelector('.stat-trigger');
         if (!trigger) return;
-        trigger.addEventListener('click', (event) => {
-          event.stopPropagation();
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
           const isOpen = item.classList.contains('show-tooltip');
           closeStatTooltips();
           if (!isOpen) item.classList.add('show-tooltip');
@@ -1616,23 +1829,21 @@
         });
       });
 
+      /* --- Hero pills --- */
       const heroPills = Array.from(document.querySelectorAll('[data-pill]'));
       heroPills.forEach((pill) => {
         let timeout = null;
-        pill.addEventListener('click', (event) => {
-          event.stopPropagation();
-          heroPills.forEach((node) => node.classList.remove('show-tooltip'));
-          pill.classList.add('show-tooltip');
-          pill.classList.add('glow');
+        pill.addEventListener('click', (e) => {
+          e.stopPropagation();
+          heroPills.forEach((n) => n.classList.remove('show-tooltip'));
+          pill.classList.add('show-tooltip', 'glow');
           if (timeout) clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            pill.classList.remove('show-tooltip');
-            pill.classList.remove('glow');
-          }, 1650);
+          timeout = setTimeout(() => pill.classList.remove('show-tooltip', 'glow'), 1650);
           addTapPulse(pill);
         });
       });
 
+      /* --- Stack animation --- */
       const stackWrap = document.querySelector('[data-stack]');
       if (stackWrap) {
         const stackNodes = Array.from(stackWrap.querySelectorAll('.stack-layer, .stack-arrow'));
@@ -1640,58 +1851,46 @@
         const stackObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
-            stackNodes.forEach((node, index) => {
-              setTimeout(() => node.classList.add('animate-in'), index * 210);
-            });
-            const totalDelay = stackNodes.length * 210 + 240;
+            stackNodes.forEach((node, i) => setTimeout(() => node.classList.add('animate-in'), i * 210));
             setTimeout(() => {
               if (!stackDiagram) return;
               stackDiagram.classList.add('pulse');
               setTimeout(() => stackDiagram.classList.remove('pulse'), 900);
-            }, totalDelay);
+            }, stackNodes.length * 210 + 240);
             stackObserver.unobserve(entry.target);
           });
         }, { threshold: 0.3 });
         stackObserver.observe(stackWrap);
       }
 
+      /* --- Live clock --- */
       const liveClock = document.getElementById('live-clock');
       const rhythmPoints = Array.from(document.querySelectorAll('.rhythm-point'));
-      const parseMinutes = (value, nowMinutes) => {
-        if (value === 'half-hourly') return nowMinutes - (nowMinutes % 30);
-        if (value === 'on-demand') return nowMinutes - 3;
-        if (value === 'overnight') return 23 * 60 + 30;
-        const [h, m] = value.split(':').map(Number);
-        return (h * 60) + m;
+      const parseMinutes = (v, now) => {
+        if (v === 'half-hourly') return now - (now % 30);
+        if (v === 'on-demand') return now - 3;
+        if (v === 'overnight') return 23 * 60 + 30;
+        const [h, m] = v.split(':').map(Number);
+        return h * 60 + m;
       };
-
       const updateLiveState = () => {
         const now = new Date();
-        if (liveClock) {
-          liveClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-        let selected = null;
-        let smallestDelta = Number.POSITIVE_INFINITY;
-        rhythmPoints.forEach((point) => {
-          const timeCode = point.getAttribute('data-time') || '';
-          const pointMinutes = parseMinutes(timeCode, nowMinutes);
-          const delta = (nowMinutes - pointMinutes + 1440) % 1440;
-          if (delta < smallestDelta) {
-            smallestDelta = delta;
-            selected = point;
-          }
+        if (liveClock) liveClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        let selected = null, smallest = Infinity;
+        rhythmPoints.forEach((p) => {
+          const d = (nowMin - parseMinutes(p.dataset.time || '', nowMin) + 1440) % 1440;
+          if (d < smallest) { smallest = d; selected = p; }
         });
-        rhythmPoints.forEach((point) => point.classList.toggle('active-now', point === selected));
+        rhythmPoints.forEach((p) => p.classList.toggle('active-now', p === selected));
       };
       updateLiveState();
       setInterval(updateLiveState, 1000);
 
-      document.addEventListener('click', (event) => {
-        if (!event.target.closest('.stat-item')) closeStatTooltips();
-        if (!event.target.closest('[data-pill]')) {
-          heroPills.forEach((pill) => pill.classList.remove('show-tooltip'));
-        }
+      /* --- Close handlers --- */
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.stat-item')) closeStatTooltips();
+        if (!e.target.closest('[data-pill]')) heroPills.forEach((p) => p.classList.remove('show-tooltip'));
       });
     });
   </script>
