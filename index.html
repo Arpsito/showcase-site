@@ -93,9 +93,14 @@
     }
 
     .section-fade {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 420ms ease, transform 420ms ease;
+    }
+
+    .section-fade.js-animate {
       opacity: 0;
       transform: translateY(14px);
-      transition: opacity 420ms ease, transform 420ms ease;
     }
 
     .section-fade.visible {
@@ -892,11 +897,16 @@
       border-radius: inherit;
     }
 
-    /* Staggered reveal children */
+    /* Staggered reveal children — hidden only when JS is active */
     .stagger-child {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 400ms ease, transform 400ms ease;
+    }
+
+    .stagger-child.js-stagger {
       opacity: 0;
       transform: translateY(16px);
-      transition: opacity 400ms ease, transform 400ms ease;
     }
 
     .stagger-child.revealed {
@@ -904,12 +914,12 @@
       transform: translateY(0);
     }
 
-    /* Slide direction variants */
-    .section-fade.from-left {
+    /* Slide direction variants — only active when JS adds js-animate */
+    .section-fade.js-animate.from-left {
       transform: translateX(-24px);
     }
 
-    .section-fade.from-right {
+    .section-fade.js-animate.from-right {
       transform: translateX(24px);
     }
 
@@ -1643,20 +1653,26 @@
 
       revealTargets.forEach((section) => {
         if (section.classList.contains('visible')) return;
-        if (!prefersRM) section.classList.add(dirs[dirIdx % 3]);
-        dirIdx++;
-
-        /* Mark stagger children inside unrevealed sections */
         if (!prefersRM) {
+          /* JS-gate: add js-animate so CSS hides the section */
+          section.classList.add('js-animate');
+          section.classList.add(dirs[dirIdx % 3]);
+
+          /* Mark stagger children inside unrevealed sections */
           section.querySelectorAll('.stat-item, .cap-card, .week-card, .rhythm-point, .placeholder-card').forEach((el) => {
             el.classList.add('stagger-child');
+            el.classList.add('js-stagger');
           });
         }
+        dirIdx++;
       });
 
       /* Also mark roadmap cards */
       if (!prefersRM) {
-        document.querySelectorAll('#next article').forEach((el) => el.classList.add('stagger-child'));
+        document.querySelectorAll('#next article').forEach((el) => {
+          el.classList.add('stagger-child');
+          el.classList.add('js-stagger');
+        });
       }
 
       const revealObserver = new IntersectionObserver((entries) => {
@@ -1669,7 +1685,7 @@
           });
           revealObserver.unobserve(entry.target);
         });
-      }, { threshold: 0.12 });
+      }, { threshold: 0.08 });
 
       revealTargets.forEach((node) => {
         if (!node.classList.contains('visible')) revealObserver.observe(node);
