@@ -915,12 +915,20 @@
     }
 
     /* Slide direction variants — only active when JS adds js-animate */
+    .section-fade.js-animate.from-up {
+      transform: translateY(14px);
+    }
+
     .section-fade.js-animate.from-left {
       transform: translateX(-24px);
     }
 
     .section-fade.js-animate.from-right {
       transform: translateX(24px);
+    }
+
+    .section-fade.from-up.visible {
+      transform: translateY(0);
     }
 
     .section-fade.from-left.visible,
@@ -945,6 +953,7 @@
       html { scroll-behavior: auto; }
       .scroll-progress { display: none; }
       .section-fade,
+      .section-fade.from-up,
       .section-fade.from-left,
       .section-fade.from-right {
         opacity: 1;
@@ -1002,8 +1011,8 @@
   </header>
 
   <main>
-    <section id="hero" class="px-6 md:px-10 lg:px-2 py-14 md:py-20 section-fade visible hero-gradient">
-      <div class="max-w-6xl mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center">
+    <section id="hero" class="px-6 md:px-10 lg:px-2 py-8 md:py-20 section-fade visible hero-gradient">
+      <div class="max-w-6xl mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-6 lg:gap-10 items-center">
         <div>
           <p class="inline-flex text-xs tracking-[0.2em] uppercase text-[#6f6f82] font-semibold border border-[#e6e8ee] rounded-full px-3 py-1">AI System Showcase</p>
           <h1 class="parallax-head mt-5 font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.03] text-[#1a1a2e]">A Personal AI Operating System</h1>
@@ -1648,7 +1657,7 @@
 
       /* --- Staggered reveals with alternating slide directions --- */
       const revealTargets = document.querySelectorAll('.section-fade');
-      const dirs = ['', 'from-left', 'from-right'];
+      const dirs = ['from-up', 'from-left', 'from-right'];
       let dirIdx = 0;
 
       revealTargets.forEach((section) => {
@@ -1656,7 +1665,8 @@
         if (!prefersRM) {
           /* JS-gate: add js-animate so CSS hides the section */
           section.classList.add('js-animate');
-          section.classList.add(dirs[dirIdx % 3]);
+          const dir = dirs[dirIdx % 3];
+          if (dir) section.classList.add(dir);
 
           /* Mark stagger children inside unrevealed sections */
           section.querySelectorAll('.stat-item, .cap-card, .week-card, .rhythm-point, .placeholder-card').forEach((el) => {
